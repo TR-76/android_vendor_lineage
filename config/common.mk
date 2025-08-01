@@ -141,10 +141,15 @@ PRODUCT_PACKAGES += \
     framework_compatibility_matrix.lineage.xml
 
 # Lineage packages
-ifeq ($(PRODUCT_IS_ATV),)
+TARGET_INCLUDES_LOS_PREBUILTS ?= false
+ifeq ($(TARGET_INCLUDES_LOS_PREBUILTS),true)
 PRODUCT_PACKAGES += \
+    Canvas
     ExactCalculator \
-    Jelly
+    Jelly \
+    Glimpse \
+    Etar \
+    Twelve
 endif
 
 ifeq ($(PRODUCT_IS_AUTOMOTIVE),)
