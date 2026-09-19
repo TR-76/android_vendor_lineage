@@ -468,17 +468,17 @@ class MergedDeviceTree(object):
 		for mdt in self.merged_devicetrees:
 			yield mdt.save(name, out_dir)
 
-def find_symbol(dtbs, symbol):
-	for symbols, _, dt in dtbs:
-		if symbol in symbols:
+def find_symbol(dtbs, symbol, consumer):
+	for symbols, _, dt, device_tree in dtbs:
+		if symbol in symbols and consumer == device_tree:
 			return dt
 
 def create_adjacency(dtbs):
 	graph = {}
-	for _, fixups, dt in dtbs:
+	for _, fixups, dt, consumer in dtbs:
 		graph[dt] = set()
 		for fixup in fixups:
-			graph[dt].add(find_symbol(dtbs, fixup))
+			graph[dt].add(find_symbol(dtbs, fixup, consumer))
 	return graph
 
 def parse_tech_dt_files(folder):
@@ -488,7 +488,7 @@ def parse_tech_dt_files(folder):
 			if os.path.splitext(filename)[1] in ['.dtbo','.dtb']:
 				filepath = os.path.join(root, filename)
 				dt = DeviceTree(filepath)
-				dtbs.append((dt.list_props('/__symbols__'), dt.list_props('/__fixups__'), filepath))
+				dtbs.append((dt.list_props('/__symbols__'), dt.list_props('/__fixups__'), filepath, dt))
 	graph = create_adjacency(dtbs)
 	ts = graphlib.TopologicalSorter(graph)
 	order = list(ts.static_order())
